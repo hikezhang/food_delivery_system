@@ -13,9 +13,11 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/admin/dish")
@@ -26,11 +28,18 @@ public class DishController {
     @Autowired
     private DishService dishService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @PostMapping
     @ApiOperation("新增菜品")
     public Result save(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品：{}", dishDTO);
         dishService.saveWithFlavor(dishDTO);
+
+        // 清理缓存数据
+        String key = "dish_" + dishDTO.getCategoryId();
+        cleanCache(key);
         return Result.success();
     }
 
@@ -47,6 +56,9 @@ public class DishController {
     public Result delete(@RequestParam List<Long> ids) {
         log.info("菜品批量删除");
         dishService.deleteBatch(ids);
+
+        // 清理所有菜品缓存数据
+        cleanCache("dish_*");
         return Result.success();
     }
 
@@ -64,6 +76,9 @@ public class DishController {
     public Result update(@RequestBody DishDTO dishDTO) {
         log.info("修改菜品：{}", dishDTO);
         dishService.updateWithFlavor(dishDTO);
+
+        // 清理缓存
+        cleanCache("dish_*");
         return Result.success();
     }
 
@@ -73,5 +88,22 @@ public class DishController {
 
         List<Dish> dishes = dishService.list(categoryId);
         return Result.success(dishes);
+    }
+
+    // 修改状态
+    @PostMapping("/status/{status}")
+    @ApiOperation("更改套餐状态")
+    public Result setStatus(@PathVariable Integer status, Long id) {
+
+        dishService.setStatus(status, id);
+        cleanCache("dish_*");
+        return Result.success();
+    }
+
+
+    // 清理缓存数据
+    private void cleanCache(String pattern) {
+        Set keys = redisTemplate.keys("dish_*");
+        redisTemplate.delete(keys);
     }
 }
