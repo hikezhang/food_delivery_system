@@ -12,4 +12,8 @@ public interface ShoppingCartService {
 
     // 查看购物车
     List<ShoppingCart> showShoppingCart();
+
+    void clean();
+
+    void sub(ShoppingCartDTO shoppingCartDTO);
 }
