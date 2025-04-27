@@ -36,4 +36,7 @@ public interface OrderMapper {
     // 查找超时订单
     @Select("select * from orders where status = #{status} and order_time < #{orderTime}")
     List<Orders> getByStatusAndOrderTimeLT(Integer status, LocalDateTime orderTime);
+
+    @Select("select * from orders where number = #{orderNumber}")
+    Orders getByNumber(String orderNumber);
 }

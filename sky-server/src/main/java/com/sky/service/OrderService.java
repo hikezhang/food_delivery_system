@@ -32,4 +32,8 @@ public interface OrderService {
     void delivery(Long id);
 
     void complete(Long id);
+
+    String payment(String orderNumber);
+
+    void reminder(Long id);
 }
