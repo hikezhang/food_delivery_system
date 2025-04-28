@@ -40,4 +40,7 @@ public interface OrderMapper {
 
     // 查询当日营业额
     Double sumByMap(Map map);
+
+    // 查询当日订单数量
+    Integer countByMap(Map map);
 }
