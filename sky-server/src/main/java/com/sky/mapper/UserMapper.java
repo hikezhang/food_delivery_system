@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Map;
+
 @Mapper
 public interface UserMapper {
 
@@ -14,4 +16,7 @@ public interface UserMapper {
 
     // 自动完成注册
     void insert(User user);
+
+    // 根据动态调节统计用户数量
+    Integer countByMap(Map map);
 }
